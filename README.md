@@ -5,7 +5,7 @@ by:
 -Abdelrahman Ashraf
 -Menna Mohammed
 
-# WE will collect all tasks that we made and put it into simple GUI 
+# We will collect all tasks that we made and put it into simple GUI 
 ##
 The project contains:
 -
