@@ -1,0 +1,453 @@
+classdef ImageHistogramsAppExample < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure               matlab.ui.Figure
+        LoadButton_2           matlab.ui.control.Button
+        CheckBox_2             matlab.ui.control.CheckBox
+        CheckBox               matlab.ui.control.CheckBox
+        LoadButton             matlab.ui.control.Button
+        OneOperationPanel      matlab.ui.container.Panel
+        divmalSlider           matlab.ui.control.Slider
+        divmalSliderLabel      matlab.ui.control.Label
+        brightnessSlider       matlab.ui.control.Slider
+        brightnessSliderLabel  matlab.ui.control.Label
+        RedAxes_2              matlab.ui.control.UIAxes
+        GreenAxes_2            matlab.ui.control.UIAxes
+        BlueAxes_2             matlab.ui.control.UIAxes
+        ImageAxes_2            matlab.ui.control.UIAxes
+        RedAxes                matlab.ui.control.UIAxes
+        BlueAxes               matlab.ui.control.UIAxes
+        GreenAxes              matlab.ui.control.UIAxes
+        ImageAxes              matlab.ui.control.UIAxes
+    end
+
+   
+    properties (Access = private)
+        RGBImage % Description
+        RedChannel % Description
+        GreenChannel
+        BlueChannel
+        rows % Description
+        columns % Description
+
+        RGBImage2 % Description
+        RedChannel2 % Description
+        GreenChannel2
+        BlueChannel2
+        rows2 % Description
+        columns2 % Description
+    end
+    
+    methods (Access = private)
+                    
+            function updateimage(app,imagefile,imagematrix)
+
+            if imagefile ~= '~'
+                % For corn.tif, read the second image in the file
+                if strcmp(imagefile,'corn.tif')
+                    im = imread('corn.tif', 2);
+                else
+                    try
+                        im = imread(imagefile);
+                    catch ME
+                        % If problem reading image, display error message
+                        uialert(app.UIFigure, ME.message, 'Image Error');
+                        return;
+                    end 
+
+                end
+            app.RGBImage = im;
+            app.RedChannel = app.RGBImage(:,:,1); % Red channel
+            app.GreenChannel = app.RGBImage(:,:,2); % Green channel
+            app.BlueChannel = app.RGBImage(:,:,3); % Blue channel
+            [app.rows,app.columns,~] = size(im);
+            else
+                im = imagematrix;
+            end
+            
+            % Create histograms based on number of color channels
+            switch size(im,3)
+                case 1
+                    % Display the grayscale image
+                    imagesc(app.ImageAxes,im);
+                    
+                    % Plot all histograms with the same data for grayscale
+                    histr = histogram(app.RedAxes, im, 'FaceColor',[1 0 0],'EdgeColor', 'none');
+                    histg = histogram(app.GreenAxes, im, 'FaceColor',[0 1 0],'EdgeColor', 'none');
+                    histb = histogram(app.BlueAxes, im, 'FaceColor',[0 0 1],'EdgeColor', 'none');
+                    
+                case 3
+                    % Display the truecolor image
+                    imagesc(app.ImageAxes,im);
+                    
+                    % Plot the histograms
+                    histr = histogram(app.RedAxes, im(:,:,1), 'FaceColor', [1 0 0], 'EdgeColor', 'none');
+                    histg = histogram(app.GreenAxes, im(:,:,2), 'FaceColor', [0 1 0], 'EdgeColor', 'none');
+                    histb = histogram(app.BlueAxes, im(:,:,3), 'FaceColor', [0 0 1], 'EdgeColor', 'none');
+                    
+                otherwise
+                    % Error when image is not grayscale or truecolor
+                    uialert(app.UIFigure, 'Image must be grayscale or truecolor.', 'Image Error');
+                    return;
+            end
+                % Get largest bin count
+                maxr = max(histr.BinCounts);
+                maxg = max(histg.BinCounts);
+                maxb = max(histb.BinCounts);
+                maxcount = max([maxr maxg maxb]);
+                
+                % Set y axes limits based on largest bin count
+                app.RedAxes.YLim = [0 maxcount];
+                app.GreenAxes.YLim = [0 maxcount];
+                app.BlueAxes.YLim = [0 maxcount];
+              
+            end
+        function updatematrix(app,Red,Green,Blue)
+            app.RedChannel = Red;
+            app.GreenChannel = Green;
+            app.BlueChannel = Blue;
+            New_Image = cat(3, app.RedChannel, app.GreenChannel, app.BlueChannel);
+            app.updateimage('~',New_Image)
+        end
+    end
+
+    
+  %FOR IMAGE 2
+        methods (Access = private)
+                    
+            function updateimage2(app,imagefile,imagematrix2)
+
+            if imagefile ~= '~'
+                % For corn.tif, read the second image in the file
+                if strcmp(imagefile,'corn.tif')
+                    im2 = imread('corn.tif', 2);
+                else
+                    try
+                        im2 = imread(imagefile);
+                    catch ME
+                        % If problem reading image, display error message
+                        uialert(app.UIFigure, ME.message, 'Image Error');
+                        return;
+                    end 
+
+                end   
+            app.RGBImage2 = im2;
+            app.RedChannel2 = app.RGBImage2(:,:,1); % Red channel
+            app.GreenChannel2 = app.RGBImage2(:,:,2); % Green channel
+            app.BlueChannel2 = app.RGBImage2(:,:,3); % Blue channel
+            [app.rows2,app.columns2,~] = size(im2);
+            else
+                im2 = imagematrix2;
+            end
+            
+            % Create histograms based on number of color channels
+            switch size(im2,3)
+                case 1
+                    % Display the grayscale image
+                    imagesc(app.ImageAxes2,im2);
+                    
+                    % Plot all histograms with the same data for grayscale
+                    histr = histogram(app.RedAxes_2, im2, 'FaceColor',[1 0 0],'EdgeColor', 'none');
+                    histg = histogram(app.GreenAxes_2, im2, 'FaceColor',[0 1 0],'EdgeColor', 'none');
+                    histb = histogram(app.BlueAxes_2, im2, 'FaceColor',[0 0 1],'EdgeColor', 'none');
+                    
+                case 3
+                    % Display the truecolor image
+                    imagesc(app.ImageAxes_2,im2);
+                    
+                    % Plot the histograms
+                    histr = histogram(app.RedAxes_2, im2(:,:,1), 'FaceColor', [1 0 0], 'EdgeColor', 'none');
+                    histg = histogram(app.GreenAxes_2, im2(:,:,2), 'FaceColor', [0 1 0], 'EdgeColor', 'none');
+                    histb = histogram(app.BlueAxes_2, im2(:,:,3), 'FaceColor', [0 0 1], 'EdgeColor', 'none');
+                    
+                otherwise
+                    % Error when image is not grayscale or truecolor
+                    uialert(app.UIFigure, 'Image must be grayscale or truecolor.', 'Image Error');
+                    return;
+            end
+                % Get largest bin count
+                maxr = max(histr.BinCounts);
+                maxg = max(histg.BinCounts);
+                maxb = max(histb.BinCounts);
+                maxcount = max([maxr maxg maxb]);
+                
+                % Set y axes limits based on largest bin count
+                app.RedAxes_2.YLim = [0 maxcount];
+                app.GreenAxes_2.YLim = [0 maxcount];
+                app.BlueAxes_2.YLim = [0 maxcount];
+              
+            end
+        function updatematrix2(app,Red,Green,Blue)
+            app.RedChannel2 = Red;
+            app.GreenChannel2 = Green;
+            app.BlueChannel2 = Blue;
+            New_Image2 = cat(3, app.RedChannel2, app.GreenChannel2, app.BlueChannel2);
+            app.updateimage2('~',New_Image2)
+        end
+    end
+
+    
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Code that executes after component creation
+        function startupFcn(app)
+            % Configure image axes
+            app.ImageAxes.Visible = 'off';
+            app.ImageAxes.Colormap = gray(256);
+            axis(app.ImageAxes, 'image');
+            
+            % Update the image and histograms
+            updateimage(app, 'peppers.png');
+
+            
+            % Configure image axes
+            app.ImageAxes_2.Visible = 'off';
+            app.ImageAxes_2.Colormap = gray(256);
+            axis(app.ImageAxes_2, 'image');
+            
+            % Update the image and histograms
+            updateimage2(app, 'corn.tif');
+        end
+
+        % Button pushed function: LoadButton
+        function LoadButtonPushed(app, event)
+               
+            % Display uigetfile dialog
+            filterspec = {'*.jpg;*.tif;*.png;*.gif','All Image Files'};
+            [f, p] = uigetfile(filterspec);
+            
+            % Make sure user didn't cancel uigetfile dialog
+            if (ischar(p))
+               fname = [p f];
+               updateimage(app, fname);
+            end
+        end
+
+        % Button pushed function: LoadButton_2
+        function LoadButton_2Pushed(app, event)
+            % Display uigetfile dialog
+            filterspec = {'*.jpg;*.tif;*.png;*.gif','All Image Files'};
+            [f, p] = uigetfile(filterspec);
+            
+            % Make sure user didn't cancel uigetfile dialog
+            if (ischar(p))
+               fname = [p f];
+               updateimage2(app, fname);
+            end
+        end
+
+        % Value changing function: brightnessSlider
+        function brightnessSliderValueChanging(app, event)
+            changingValue = event.Value;
+            
+            red=imadd(app.RGBImage(:,:,1),changingValue);
+            green=imadd(app.RGBImage(:,:,2),changingValue);
+            blue=imadd(app.RGBImage(:,:,3),changingValue);
+            app.updatematrix(red,green,blue)
+        end
+
+        % Value changed function: divmalSlider
+        function divmalSliderValueChanged(app, event)
+            value = app.divmalSlider.Value;
+            if (value*1==value)
+            red=immultiply(app.RGBImage(:,:,1),value);
+            green=immultiply(app.RGBImage(:,:,2),value);
+            blue=immultiply(app.RGBImage(:,:,3),value);
+            app.updatematrix(red,green,blue)
+            else
+            red=imdivide(app.RGBImage(:,:,1),value);
+            green=imdivide(app.RGBImage(:,:,2),value);
+            blue=imdivide(app.RGBImage(:,:,3),value);
+            app.updatematrix(red,green,blue)
+            end
+
+        end
+    end
+
+    % Component initialization
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create UIFigure and hide until all components are created
+            app.UIFigure = uifigure('Visible', 'off');
+            app.UIFigure.AutoResizeChildren = 'off';
+            app.UIFigure.Position = [100 100 702 528];
+            app.UIFigure.Name = 'Image Histograms';
+            app.UIFigure.Resize = 'off';
+
+            % Create ImageAxes
+            app.ImageAxes = uiaxes(app.UIFigure);
+            app.ImageAxes.XTick = [];
+            app.ImageAxes.XTickLabelRotation = 0;
+            app.ImageAxes.XTickLabel = {'[ ]'};
+            app.ImageAxes.YTick = [];
+            app.ImageAxes.YTickLabelRotation = 0;
+            app.ImageAxes.ZTickLabelRotation = 0;
+            app.ImageAxes.Position = [55 204 240 183];
+
+            % Create GreenAxes
+            app.GreenAxes = uiaxes(app.UIFigure);
+            title(app.GreenAxes, 'Green')
+            xlabel(app.GreenAxes, 'Intensity')
+            app.GreenAxes.XLim = [0 255];
+            app.GreenAxes.XTick = [0 128 255];
+            app.GreenAxes.XTickLabelRotation = 0;
+            app.GreenAxes.YTickLabelRotation = 0;
+            app.GreenAxes.ZTickLabelRotation = 0;
+            app.GreenAxes.Position = [120 397 110 81];
+
+            % Create BlueAxes
+            app.BlueAxes = uiaxes(app.UIFigure);
+            title(app.BlueAxes, 'Blue')
+            xlabel(app.BlueAxes, 'Intensity')
+            app.BlueAxes.XLim = [0 255];
+            app.BlueAxes.XTick = [0 128 255];
+            app.BlueAxes.XTickLabelRotation = 0;
+            app.BlueAxes.YTickLabelRotation = 0;
+            app.BlueAxes.ZTickLabelRotation = 0;
+            app.BlueAxes.Position = [206 396 119 81];
+
+            % Create RedAxes
+            app.RedAxes = uiaxes(app.UIFigure);
+            title(app.RedAxes, 'Red')
+            xlabel(app.RedAxes, 'Intensity')
+            ylabel(app.RedAxes, 'Pixels')
+            app.RedAxes.XLim = [0 255];
+            app.RedAxes.XTick = [0 128 255];
+            app.RedAxes.XTickLabelRotation = 0;
+            app.RedAxes.YTickLabelRotation = 0;
+            app.RedAxes.ZTickLabelRotation = 0;
+            app.RedAxes.Position = [26 397 116 83];
+
+            % Create ImageAxes_2
+            app.ImageAxes_2 = uiaxes(app.UIFigure);
+            app.ImageAxes_2.XTick = [];
+            app.ImageAxes_2.XTickLabelRotation = 0;
+            app.ImageAxes_2.XTickLabel = {'[ ]'};
+            app.ImageAxes_2.YTick = [];
+            app.ImageAxes_2.YTickLabelRotation = 0;
+            app.ImageAxes_2.ZTickLabelRotation = 0;
+            app.ImageAxes_2.Position = [408 204 240 183];
+
+            % Create BlueAxes_2
+            app.BlueAxes_2 = uiaxes(app.UIFigure);
+            title(app.BlueAxes_2, 'Blue')
+            xlabel(app.BlueAxes_2, 'Intensity')
+            app.BlueAxes_2.XLim = [0 255];
+            app.BlueAxes_2.XTick = [0 128 255];
+            app.BlueAxes_2.XTickLabelRotation = 0;
+            app.BlueAxes_2.YTickLabelRotation = 0;
+            app.BlueAxes_2.ZTickLabelRotation = 0;
+            app.BlueAxes_2.Position = [550 397 119 81];
+
+            % Create GreenAxes_2
+            app.GreenAxes_2 = uiaxes(app.UIFigure);
+            title(app.GreenAxes_2, 'Green')
+            xlabel(app.GreenAxes_2, 'Intensity')
+            app.GreenAxes_2.XLim = [0 255];
+            app.GreenAxes_2.XTick = [0 128 255];
+            app.GreenAxes_2.XTickLabelRotation = 0;
+            app.GreenAxes_2.YTickLabelRotation = 0;
+            app.GreenAxes_2.ZTickLabelRotation = 0;
+            app.GreenAxes_2.Position = [457 397 110 81];
+
+            % Create RedAxes_2
+            app.RedAxes_2 = uiaxes(app.UIFigure);
+            title(app.RedAxes_2, 'Red')
+            xlabel(app.RedAxes_2, 'Intensity')
+            ylabel(app.RedAxes_2, 'Pixels')
+            app.RedAxes_2.XLim = [0 255];
+            app.RedAxes_2.XTick = [0 128 255];
+            app.RedAxes_2.XTickLabelRotation = 0;
+            app.RedAxes_2.YTickLabelRotation = 0;
+            app.RedAxes_2.ZTickLabelRotation = 0;
+            app.RedAxes_2.Position = [349 396 116 83];
+
+            % Create OneOperationPanel
+            app.OneOperationPanel = uipanel(app.UIFigure);
+            app.OneOperationPanel.AutoResizeChildren = 'off';
+            app.OneOperationPanel.Title = 'One Operation';
+            app.OneOperationPanel.Position = [26 1 305 138];
+
+            % Create brightnessSliderLabel
+            app.brightnessSliderLabel = uilabel(app.OneOperationPanel);
+            app.brightnessSliderLabel.HorizontalAlignment = 'right';
+            app.brightnessSliderLabel.Position = [13 85 60 22];
+            app.brightnessSliderLabel.Text = 'brightness';
+
+            % Create brightnessSlider
+            app.brightnessSlider = uislider(app.OneOperationPanel);
+            app.brightnessSlider.Limits = [-255 255];
+            app.brightnessSlider.ValueChangingFcn = createCallbackFcn(app, @brightnessSliderValueChanging, true);
+            app.brightnessSlider.Position = [148 95 122 3];
+
+            % Create divmalSliderLabel
+            app.divmalSliderLabel = uilabel(app.OneOperationPanel);
+            app.divmalSliderLabel.HorizontalAlignment = 'right';
+            app.divmalSliderLabel.Position = [72 34 51 22];
+            app.divmalSliderLabel.Text = 'div& mal';
+
+            % Create divmalSlider
+            app.divmalSlider = uislider(app.OneOperationPanel);
+            app.divmalSlider.Limits = [-50 50];
+            app.divmalSlider.ValueChangedFcn = createCallbackFcn(app, @divmalSliderValueChanged, true);
+            app.divmalSlider.Position = [144 43 125 3];
+
+            % Create LoadButton
+            app.LoadButton = uibutton(app.UIFigure, 'push');
+            app.LoadButton.ButtonPushedFcn = createCallbackFcn(app, @LoadButtonPushed, true);
+            app.LoadButton.Position = [55 152 225 22];
+            app.LoadButton.Text = 'Load Custom Image';
+
+            % Create CheckBox
+            app.CheckBox = uicheckbox(app.UIFigure);
+            app.CheckBox.Position = [55 183 80 22];
+
+            % Create CheckBox_2
+            app.CheckBox_2 = uicheckbox(app.UIFigure);
+            app.CheckBox_2.Position = [408 183 80 22];
+
+            % Create LoadButton_2
+            app.LoadButton_2 = uibutton(app.UIFigure, 'push');
+            app.LoadButton_2.ButtonPushedFcn = createCallbackFcn(app, @LoadButton_2Pushed, true);
+            app.LoadButton_2.Position = [408 152 225 22];
+            app.LoadButton_2.Text = 'Load Custom Image_2';
+
+            % Show the figure after all components are created
+            app.UIFigure.Visible = 'on';
+        end
+    end
+
+    % App creation and deletion
+    methods (Access = public)
+
+        % Construct app
+        function app = ImageHistogramsAppExample
+
+            % Create UIFigure and components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            % Execute the startup function
+            runStartupFcn(app, @startupFcn)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end
